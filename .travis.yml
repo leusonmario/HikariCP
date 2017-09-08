@@ -10,7 +10,7 @@ install: /bin/true
   
 script:
   - mvn install -Dskip.unit.tests=true -Dmaven.javadoc.skip=true -V -B
-  - mvn clean -Dtest=ShutdownTest#testShutdownTestCoveralls test jacoco:report coveralls:report
+  - mvn clean -Dtest=ShutdownTest test jacoco:report coveralls:report
   - jdk_switcher use openjdk7
 
 before_deploy:
