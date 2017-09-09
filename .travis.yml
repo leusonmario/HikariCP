@@ -1,9 +1,28 @@
 language: java
+sudo: required
+cache:
+  directories:
+    - $HOME/.m2/repository
 jdk:
   - oraclejdk8
 
 install: /bin/true
-
+  
 script:
   - mvn install -Dskip.unit.tests=true -Dmaven.javadoc.skip=true -V -B
-  - mvn clean test coveralls:report -V -P coverage 
+  - mvn clean -Dtest=ShutdownTest test jacoco:report coveralls:report
+  - jdk_switcher use openjdk7
+
+before_deploy:
+  - tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/HikariCP/target/site
+
+deploy:
+  provider: releases
+  api_key: 
+    secure: "E8O66NET7gawptgAvfq3iE1pHHUL6N+Lq5MncVEphTDvDHDTLzwQLpLhHqeV9kaSMRG9SLe2i6nzVS7eADgVuBKRWca0mrCDcjMA5Yb/nYwTjvi8VlX9GNNUyRtlxWK4XqXYMIMRgPDZ3JDRDWTUDBlYWo6VwKPY+GSZcl421Ne/xvNKo2gdPxl/l9x6z6nqrVyGqDYptE4PXD/C/kV6Y8tr78w0FBQUX6PquYq8/Bi6RlEtFtlOZqoiNv5E9fa346ojd6cyb4cCpkShVTMsmH3EvbO8Xg5bm8jS6tns+Q8esw0MYVgE7F+neFZiPZavfQNkPZUWBPs6lpx6U4kURac7DBnIu6V9gHOHpl4FXvV89b0d+SVztUqHfAGdAfG8DUFbxbbDhE561Dq6AAviUYaCidSehI+XhT8nUs0mr50jvSuzwrapjAgaSUHXDp4dc9jDvvYif4Kegld53S0NhZgzhHjnRkr6HayGokKS3MX96ycqEvkOwa17HhQgRZ+q2q09X4YWilN5xF7APejJizCxKl0Tnjrne0/IU+lg+3ekEWPUSXjG5rvjszEkY7Yf5V+Zqy+hQdTj+DRUQ/QDJz1tY0B9ODzpBp9CvUMn3MN07iG8vuDkOUrCsoHmspOJntaTbc5hWCHuAEn1I5FELx7mQy8gRF/PZU+GTQFyTdc="
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
