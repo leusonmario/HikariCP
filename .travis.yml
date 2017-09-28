@@ -1,3 +1,4 @@
+sudo: required
 language: java
 jdk:
   - oraclejdk8
@@ -6,4 +7,21 @@ install: /bin/true
 
 script:
   - mvn install -Dskip.unit.tests=true -Dmaven.javadoc.skip=true -V -B
-  - mvn clean test coveralls:report -V -P coverage 
+
+  - mvn clean -Dtest=TestMetrics#testMetricUsage test jacoco:report coveralls:report
+
+
+before_deploy:
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/HikariCP/target/site
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "h2HPZ29H5JTobbIIPeXlsd9z87gFL6N9QvA8czoPFaNCKkzuuep64eOfKNdXjHvQVtICU5gS6pEVj6BFi0SReiKTFNOz1TVsVwmMTp7MOsfMXYZ2RnUXzszm7HymUHJdeDUiHFHpNNdAfIdM08ETSyB3rOYK2XOYzS2FpqyB7cNsNYkDip9uMkJRoMbMsSH8wDTzvAWvuQKeNQouSfiH5K6Xw5HqUV/UE8VdEdL9SY0J5bVGhqLA8elHALT+KDetXkR1dMq/9+CbEhskpX9DITtok67fZRgziTWjQd0Lrtv1ed/tCDKrLHAu+TbVKib1x0rQC3O9paQ5hRZ9kX3h7SL081Cxvt49aqtxNmws2Ebapnt7igUjIvi24lMN7ex0xwHF56XfxDfM9+Vr/5/fmHo0YcdrnEB9bR8NzcE4DBS65Pgv2ZddmbRMS549rD/IHFfVyTr3G/LyW6FffdC7DJu5QJWHwVd6qIcNCXwqv6ssSQqsDwPGg8/i5JXCOMLH6kHYO85ZxrYvL6d0JMrWNfvgHlEgtaCB3HHBVuBBzCOWnLR8ml2wsmMYbUzUqEIORPjzu61ldrDpHUAX6zLRArt2AWFawFsIevuhcqnVXNDx7H7m7oXeFJ6o0yB3ak7KTLhTtdsEBiSG2SC6wjsLaUsTXXAyC0y6QuVs7i0iNoE="
+
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
