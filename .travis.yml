@@ -1,3 +1,24 @@
+
+sudo: required
 language: java
 jdk:
   - oraclejdk7
+
+script:
+- mvn clean -Dtest=CreationTest#testMaxLifetime test jacoco:report
+
+
+before_deploy:
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/HikariCP/target/site
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "HuA9zdULTpOMEAnu02j92dJ2yR4JgfR3WV/Fg88QP0hpToYY1eyoQCsll4nrITn7cW3EQe3E+L5aku95Fpl3Nz5bOwIhnxTYXAo0FbNo7G6enWpNxVndIINXGOPX1RNpQIMFG7wTJoqe42EGatUSCwDHU3xwv/0yZBUQccKn4Q9oGZ0XbfgkqiVCc1VxuaM+FYo++KuzDHVJQL3+NKFreQdt0g+DWM59XxkjWif7YRTHv/R8vV/RBXkqjB/YiUsyDEP8o0WRFu8qMzfeSUX6kN81+WOIgTCijv/25LSk94wKllh5pD1H9gJBvDnNhPf8fzhca84/gv7pSnjRuh3HIu33DDw6IGmMYrWAEzzva3fGDo7g/hzowQX5P7T9ASU+wEGvuvdKgMayznS2RsD7tt50r/sMprImhFKPAmzbaZroapFirPKk8ZKkTX4wEAwkR4lec86uqevqLr0iwNb5Q3DCYdVJWO1MOXZVJH3bhNuW2UwWYaJxuYuw/0UpySEATax5J05A4bemxiIguC1SAmO43yKQvkkSBy9eIFYZC4/Ydi6ARe9F9WtM7YmVMjMJmVpHJ4IUuUn6W2hqkAmWdJnD63be62to3Yls5d+MVlu7teJjFW9NJxuRvoxnsA+20iFN7FRWKSIK9mZZ0KpyVaJmesAeII0j76xsuEhZbQk="
+
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
