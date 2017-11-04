@@ -11,14 +11,12 @@ install: /bin/true
 
 script:
   - mvn install -Dskip.unit.tests=true -Dmaven.javadoc.skip=true -V -B
-
-  - mvn clean -Dtest=TestConnectionTimeoutRetry#testConnectionIdleFill test jacoco:report
+  - mvn clean cobertura:cobertura -Dtest=TestConnectionTimeoutRetry#testConnectionIdleFill
   - jdk_switcher use openjdk7
-  - mvn test
-
+  
 
 before_deploy:
-- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/HikariCP/target/site
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/HikariCP/target/site/cobertura
 
 deploy:
   provider: releases
