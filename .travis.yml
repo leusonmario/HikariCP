@@ -1,5 +1,6 @@
 language: java
-sudo: false
+
+sudo: required
 cache:
   directories:
     - $HOME/.m2/repository
@@ -10,6 +11,22 @@ install: /bin/true
 
 script:
   - mvn install -Dskip.unit.tests=true -Dmaven.javadoc.skip=true -V -B
-  - mvn clean test coveralls:report -V -P coverage 
+
+  - mvn clean cobertura:cobertura -Dtest=TestConnectionTimeoutRetry#testConnectionIdleFill
   - jdk_switcher use openjdk7
-  - mvn test
+
+
+before_deploy:
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/HikariCP/target/site/cobertura
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "fEuY8R77WTWWC6v53cDbtbmqr2NNF9BKtJJaWrxnMAv8hdm8Mf2vuR4LUvsD+mp0H9gh44IS+9qd+uMDQv8Qe+k0iH/xYGoBoBprsapbjcVdDuzV/bnCJcBr/a8x4U5f09dvsDXcm4rTqGLSNK/wQOsYejXXlhjT9IzzxIDSIjJ4FDyuabHshYzIaKYYoUEvApAxAcLYHvEoO6f6wTtiLOZm6xrPmRVhZ4Nh05hpzXDjUSwi27qh+53CfAymvlhNC+3yxC8R8tbb+HjVrSZNwFAaJ+KoXBdkZpjZax9pcArAACkxIbYUeCtG4YuPztrQt8KXuBQqk+VvSXclrLSw2DWzplhRgiZnfBFUAoscLa7fmu14G/TFWJvvUaIk14dXWJsPsN3WW73fYIYAQzCc/x7amPTOZi8uMeP5xHI4FMlm/9byPa42zF3fHU4/Oxq1oKm0J741Vq0vv3hyMWKwr0rV7jKGEVOdD578gT5dFM/+HKF5W5BDzNL+ZEY8n5oevClaZ33BO7YXcxf5VyIHMng3NC9QDFgeENiomaYfXK1hO1YEpIuF8mKV54CnNvRON1rMTJ7S87kN/j4KIT9KoMQq73Ps9azuMeQGLFkvhdVkmc6pvGyLcnswV6k5Epd298eT9wT2TiVfn64vZJhG/hURiTLSVYZqYfSU1aLijtg="
+
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
