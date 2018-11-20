@@ -1,15 +1,27 @@
+
+sudo: required
 language: java
-sudo: false
-cache:
-  directories:
-    - $HOME/.m2/repository
+
 jdk:
   - oraclejdk8
 
-install: /bin/true
+
 
 script:
-  - mvn install -Dskip.unit.tests=true -Dmaven.javadoc.skip=true -V -B
-  - mvn clean test coveralls:report -V -P coverage 
-  - jdk_switcher use openjdk7
-  - mvn test
+  - mvn clean cobertura:cobertura -Dtest=TestValidation#validateDriverAndUrl -DfailIfNoTests=false
+
+before_deploy:
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/HikariCP/target/site/cobertura
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "CRKTVa1kdaOrvAJjmHO6jLxleOj2p/ns1bDUkwos/rw/7N8oSEHlVZKdO+rtVLaZwToOwpP814lPyQxsRKRl+QSJnWaZ7LofL6p+OE3iayZnVCylIueR4TNALADjcR76chb6x375hA3o2Hi77gUn28wHHNZOsCpQdG3HFUbIIpk103qcJ89iniATbj49M3Pk/93eIROzkwH1txlj6cEF/e+vXL2bQs9d5fWPWKOyJ8k/G8dJzt2NHo1P6Y/YOBb30Pz3vp7E7KhjfQ2/QhkE0CXKwXch93J/mkPiIbVrGJV5ILU9gGSQuY7wIJ66WMjiw6lFG+srSX0ZfxFykJWP7hKTkhVd6kX7QlqSGLJRJprCtJnel6iJW0LMle3+lbgYmMW8Y3CRLcBBOC/F66hF03aFlkKLUd+UUOzXHfqovUUAO37KT7nltIJ+FYldqPD17DYjtfcNoxDaLpz6fiBb2iclrBMhpiIeaJL129N4APy1YVipZO/Yrz4R+gS31D9rG1at6Tsf2bgj5azpTZBfN4QABVdxyfVQ49ZdQNtmRLafsrM2EE9BLJPnhNoqUGDK27kzFKCiAUTXvdI0ZhVrlKhuA9dJGvfvPxJa+ryJ0TbuShnwHnfDWmNyHKovBQ4iqZSDDiIIAVh1BZC8mmAA7qFdYXYVoZBg3+sDbZu5vao="
+
+
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
